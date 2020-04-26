@@ -84,4 +84,4 @@ function unlinkIgnore(path) {
     });
 }
 
-module.exports = { fsc: {readDirectory, walk, path, open, unlinkIgnore}, fs, fsp };
+module.exports = { fsc: {readDirectory, walk, open, unlinkIgnore}, fs, fsp, path };
