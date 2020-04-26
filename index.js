@@ -17,4 +17,31 @@ async function readDirectory(dir, options = {type = "files"}) {
     });
 }
 
-module.exports = { readDirectory };
+// Crawl a directory hierarchy, accumlate a set of results
+// as a callback processes each file.
+async function walk(dir, callback = null, results = []) {
+    const files = await fsp.readdir(dir, {withFileTypes: true});
+    const dirs = [];
+    for (const file of files) {
+        const fullPath = path.join(dir, file.name);
+        if (file.isFile()) {
+            if (callback) {
+                const r = await callback(fullPath);
+                if (r !== undefined) {
+                    results.push(r);
+                }
+            } else {
+                results.push(fullPath);
+            }
+        } else if (file.isDirectory()) {
+            // save this until we're done with files
+            dirs.push(fullPath);
+        }
+    }
+    for (const d of dirs) {
+        await walk(d, callback, results);
+    }
+    return results;
+}
+
+module.exports = { readDirectory, walk };
