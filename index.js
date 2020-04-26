@@ -5,8 +5,8 @@ const path = require('path');
 // get full path listing from a directory
 // options to filter the listing by type
 //    type: "files" | "dirs" | "both"
-async function readDirectory(dir, options = {type = "files"}) {
-    let files = await fsp.readdir({withFileTypes: true});
+async function readDirectory(dir, options = {type: "files"}) {
+    let files = await fsp.readdir(dir, {withFileTypes: true});
     if (options.type === "files") {
         files = files.filter(entry => entry.isFile());
     } else if (options.type === "dirs") {
