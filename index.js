@@ -68,7 +68,13 @@ async function open(...args) {
         return result;
     }
 
-    handle.closeLog = function(logFn = console.log.bind(console)) {
+    handle.closeIgnore = function() {
+        return this.close().catch(err => {
+            // silent about the error
+        });
+    }
+
+    handle.closeIgnoreLog = function(logFn = console.log.bind(console)) {
         return this.close().catch(err => {
             logFn(err);
             // eat the error, do not propagate it (that is the point of this function)
@@ -84,4 +90,7 @@ function unlinkIgnore(path) {
     });
 }
 
+// this is meant to be used like this:
+// const {fs, fsp, fsc, path} = require('fs-common');
+// where this modules methods are on the fsc object
 module.exports = { fsc: {readDirectory, walk, open, unlinkIgnore}, fs, fsp, path };
