@@ -5,7 +5,7 @@ const path = require('path');
 // get full path listing from a directory
 // options to filter the listing by type
 //    type: "files" | "dirs" | "both"
-async function readDirectory(dir, {type = "files"} = {}) {
+async function listDirectory(dir, {type = "files"} = {}) {
     console.log(type);
     let files = await fsp.readdir(dir, {withFileTypes: true});
     if (type === "files") {
@@ -14,7 +14,7 @@ async function readDirectory(dir, {type = "files"} = {}) {
         files = files.filter(entry => entry.isDirectory());
     }
     return files.map(entry => {
-        return path.join(dir, entry.name);
+        return path.resolve(path.join(dir, entry.name));
     });
 }
 
@@ -27,7 +27,7 @@ async function walk(dir, callback = null, results = []) {
         const fullPath = path.join(dir, file.name);
         if (file.isFile()) {
             if (callback) {
-                const r = await callback(fullPath);
+                const r = await callback(fullPath, file.name);
                 if (r !== undefined) {
                     results.push(r);
                 }
@@ -45,8 +45,19 @@ async function walk(dir, callback = null, results = []) {
     return results;
 }
 
-// call fsp.open() normally, but add a writeBufferCheck method to the handle that
-// automatically checks to see if the proper number of bytes were written to the file
+// calls fsp.open() normally, but adds several methods to the flieHandle
+//
+//    writeBufferCheck() method to the handle that automatically checks to see
+//                       if the proper number of bytes were written to the file
+//                       and throws if the desired number of bytes were not written
+//
+//    closeIgnore()      method to close the file, catch and eat errors
+//                       For use when you don't want to lgo or fail the whole
+//                       promise chain when there's an error closing the file as
+//                       there's nothing to do about it anyway
+//    closeIgnoreLog()   same as closeIgnore, but will log the error.
+//                       default logger is console.log, but you can pass a logging
+//                       function if you want.
 // We do it this way to avoid modify the fileHandle prototype and affecting other users
 // of that object
 async function open(...args) {
@@ -84,6 +95,7 @@ async function open(...args) {
     return handle;
 }
 
+// calls fsp.unlink() and ignores errors
 function unlinkIgnore(path) {
     return fsp.unlink(path).catch(err => {
         // intentionally eat the error
@@ -93,4 +105,4 @@ function unlinkIgnore(path) {
 // this is meant to be used like this:
 // const {fs, fsp, fsc, path} = require('fs-common');
 // where this modules methods are on the fsc object
-module.exports = { fsc: {readDirectory, walk, open, unlinkIgnore}, fs, fsp, path };
+module.exports = { fsc: {listDirectory, walk, open, unlinkIgnore}, fs, fsp, path };
