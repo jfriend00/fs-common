@@ -52,13 +52,13 @@ async function walk(dir, callback = null, results = []) {
 //                       and throws if the desired number of bytes were not written
 //
 //    closeIgnore()      method to close the file, catch and eat errors
-//                       For use when you don't want to lgo or fail the whole
+//                       For use when you don't want to log or fail the whole
 //                       promise chain when there's an error closing the file as
 //                       there's nothing to do about it anyway
 //    closeIgnoreLog()   same as closeIgnore, but will log the error.
 //                       default logger is console.log, but you can pass a logging
 //                       function if you want.
-// We do it this way to avoid modify the fileHandle prototype and affecting other users
+// We do it this way to avoid modifying the fileHandle prototype and affecting other users
 // of that object
 async function open(...args) {
     let handle = await fsp.open(...args);
@@ -104,5 +104,5 @@ function unlinkIgnore(path) {
 
 // this is meant to be used like this:
 // const {fs, fsp, fsc, path} = require('fs-common');
-// where this modules methods are on the fsc object
+// where this module's methods are on the fsc object
 module.exports = { fsc: {listDirectory, walk, open, unlinkIgnore}, fs, fsp, path };
