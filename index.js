@@ -1,7 +1,9 @@
 const fs = require('fs');
 const fsp = fs.promises;
 const path = require('path');
+const listDirectory = require('./fslist.js');
 
+/*
 // get full path listing from a directory
 // options to filter the listing by type
 //    type: "files" | "dirs" | "both"
@@ -17,6 +19,7 @@ async function listDirectory(dir, {type = "files"} = {}) {
         return path.resolve(path.join(dir, entry.name));
     });
 }
+*/
 
 // Crawl a directory hierarchy, accumlate a set of results
 // as a callback processes each file.
