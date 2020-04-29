@@ -77,7 +77,7 @@ async function open(...args) {
             length = buffer.length;
         }
         if (result.bytesWritten !== length) {
-            throw new Error(`All bytes not written to file ${writeArgs[0]}./nRequested to write ${length}, actually wrote ${result.bytesWritten}`);
+            throw new Error(`All bytes not written to file ${args[0]}./nRequested to write ${length}, actually wrote ${result.bytesWritten}`);
         }
         return result;
     }
