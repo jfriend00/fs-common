@@ -78,30 +78,24 @@ async function list(dir, options) {
 
         // get type of entry
         let type = "<unknown>";
+        let include = false;
         if (dirEnt.isFile()) {
             type = "file";
+            include = options.types === "files" || options.types === "both";
         } else if (dirEnt.isDirectory()) {
             type = "dir";
+            include = options.types === "dirs" || options.types === "both";
             dirs.push(obj);             // save dir for recursion option
         }
         obj.type = type;
 
+        if (!include) {
+            continue;           // skip further processing for this file/dir
+        }
+
         // see if we should skip top level files
         if (options.skipTopLevelFiles && type === "file") {
             continue;
-        }
-
-        // if set to "files" or "dirs", skip any entries that don't match
-        if (options.types === "files") {
-            if (type !== "file") {
-                // not a file, skip it
-                continue;
-            }
-        } else if (options.types === "dirs") {
-            if (type !== "dir") {
-                // not a directory, skip it
-                continue;
-            }
         }
 
         // if doing matching
