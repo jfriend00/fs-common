@@ -3,6 +3,46 @@ const fsp = fs.promises;
 const path = require('path');
 const listDirectory = require('./fslist.js');
 
+// Promise version of readble.pipe(writable)
+// that has error reporting on the readstream
+// and on the writestream
+// readable.pipe(writeable) does not monitor errors on the readstream
+//
+// options:
+//     resolveOn: "finish", "unpipe", "close"   (default is close)
+// The options object is also passed through to .pipe()
+//
+function pipe(readStream, writeStream, opts = {}) {
+    let options = Object.assign({resolveOn: "close"}, opts);
+    let resolveEvent = options.resolveOn;
+    delete options.resolveOn;
+    return new Promise((resolve, reject) => {
+        function errorHandler(err) {
+            cleanup();
+            reject(err);
+        }
+
+        function doneHandler() {
+            cleanup();
+            resolve();
+        }
+
+        function cleanup() {
+            readStream.off('error', errorHandler);
+            writeStream.off('error', errorHandler);
+            writeStream.off(resolveEvent, doneHandler);
+        }
+
+        // register our event handlers
+        readStream.once('error', errorHandler);
+        writeStream.once('error', errorHandler);
+        writeStream.once(resolveEvent, doneHandler);
+
+        // start the pipe operation
+        readStream.pipe(writeStream, options);
+    });
+}
+
 /*
 // get full path listing from a directory
 // options to filter the listing by type
@@ -108,4 +148,10 @@ function unlinkIgnore(path) {
 // this is meant to be used like this:
 // const {fs, fsp, fsc, path} = require('fs-common');
 // where this module's methods are on the fsc object
-module.exports = { fsc: {listDirectory, walk, open, unlinkIgnore}, fs, fsp, path };
+module.exports = { fsc: {
+    listDirectory,
+    walk,
+    open,
+    unlinkIgnore,
+    pipe,
+}, fs, fsp, path };
