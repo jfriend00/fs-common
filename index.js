@@ -3,6 +3,28 @@ const fsp = fs.promises;
 const path = require('path');
 const listDirectory = require('./fslist.js');
 
+// make sure a given directory exists, create it if not
+// ignore error if it already exists
+function ensureDirectory(dir, opts = {}) {
+    let options = Object.assign({recursive: true}, opts);
+    return fsp.mkdir(dir, options).catch(err => {
+        if (err.code !== 'EEXIST') throw err;
+    })
+}
+
+// make sure a given directory exists, create it if not
+// ignore error if it already exists
+function ensureDirectorySync(dir, opts = {}) {
+    let options = Object.assign({recursive: true}, opts);
+    try {
+        return fs.mkdirSync(dir, options);
+    } catch(err) {
+        if (err.code !== 'EEXIST') {
+            throw e;
+        }
+    }
+}
+
 // Promise version of readble.pipe(writable)
 // that has error reporting on the readstream
 // and on the writestream
@@ -154,4 +176,6 @@ module.exports = { fsc: {
     open,
     unlinkIgnore,
     pipe,
+    ensureDirectory,
+    ensureDirectorySync,
 }, fs, fsp, path };
