@@ -9,7 +9,7 @@ function ensureDirectory(dir, opts = {}) {
     let options = Object.assign({recursive: true}, opts);
     return fsp.mkdir(dir, options).catch(err => {
         if (err.code !== 'EEXIST') throw err;
-    })
+    });
 }
 
 // make sure a given directory exists, create it if not
