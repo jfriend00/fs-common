@@ -3,7 +3,7 @@ const path = require('path');
 
 /*
 Requires node v10.0+  (fs.promises interface)
-fsList(dir, opts = {})
+listDirectory(dir, opts = {})
 options interface:
 
    matchWhat: "ext"|"base"|"file" (defaults to "ext")
@@ -124,7 +124,7 @@ async function list(dir, options) {
                     break;
                 case "function":
                     // custom filter function, if doesn't return true, skip this item
-                    if (!await options.match(obj)) continue;
+                    if (!(await options.match(obj))) continue;
                     break;
                 default:
                     throw new TypeError(`options.match contains invalid value, should be a string, regex or function`);
